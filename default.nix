@@ -13,7 +13,7 @@
 }:
 
 buildGoApplication {
-  pname = "add-repo";
+  pname = "repo-manager";
   version = "";
   nativeBuildInputs = [ pkgs.just ];
   preBuild = ''

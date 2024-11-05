@@ -3,28 +3,17 @@ package cmd
 import (
 	"os"
 
-	"github.com/Ajlow2000/add-repo/app"
 	"github.com/spf13/cobra"
-)
-
-var (
-    debug = false
-    url = "";
-    path = "";
 )
 
 
 var rootCmd = &cobra.Command{
-	Use:   "add-repo",
+	Use:   "repo-manager",
 	Short: "",
     Long: "",
     Version: "", 
     Run: func(cmd *cobra.Command, args []string) {
-        if url == "" {
-            cmd.Help()
-        } else {
-		    app.Main(url, path)
-        }
+        cmd.Help()
     },
 }
 
@@ -36,6 +25,4 @@ func Execute() {
 }
 
 func init() {
-    rootCmd.Flags().StringVar(&url, "url", "", "The url pointing at a git repository")
-    rootCmd.Flags().StringVar(&path, "path", "$HOME/repos", "The path to clone the specified url into")
 }

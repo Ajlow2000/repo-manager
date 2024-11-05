@@ -1,4 +1,4 @@
-module github.com/Ajlow2000/add-repo
+module github.com/Ajlow2000/repo-manager
 
 go 1.22.1
 

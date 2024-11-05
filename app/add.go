@@ -7,13 +7,16 @@ import (
 	"strings"
 )
 
+const GIT_SSH_PREFIX = "git@"
+const GIT_HTTPS_PREFIX = "https://"
+
 // Build a name for the local checkout of the specified url.
 // Namespaces repos under the owner's username (in lower case)
 func buildLocalDirName(url string) string {
     userName := ""
     projectName := ""
 
-    if strings.HasPrefix(url, "git@") {     // ssh
+    if strings.HasPrefix(url, GIT_SSH_PREFIX) {     // ssh
         url = strings.Split(url, ":")[1]
         params := strings.Split(url, "/")
         userName = params[0]
@@ -30,13 +33,36 @@ func buildLocalDirName(url string) string {
     return userName + "_" + projectName;
 }
 
-func Main(url string, path string) {
+func buildUrl(urlPrefix string, repo string) string {
+    repoUrl := ""
+
+    if ( (strings.HasPrefix(repo, GIT_SSH_PREFIX) || strings.HasPrefix(repo, GIT_HTTPS_PREFIX)) && strings.HasSuffix(repo, ".git")) {
+        // Ignoring urlPrefix
+        repoUrl = repo
+    } else {
+        if (strings.HasPrefix(urlPrefix, GIT_SSH_PREFIX) || strings.HasPrefix(urlPrefix, GIT_HTTPS_PREFIX)) {
+            if (strings.HasSuffix(urlPrefix, "/")) {
+                repoUrl = urlPrefix + repo + ".git"
+            } else {
+                repoUrl = urlPrefix + "/" + repo + ".git"
+            }
+        }
+    }
+
+    return repoUrl
+}
+
+func Add(urlPrefix string, repo string, path string) {
     path = os.Expand(path, os.Getenv)
 
-	localName := buildLocalDirName(url)
+    repoUrl := buildUrl(urlPrefix, repo)
+    fmt.Println("Repo url: " + repoUrl)
+    fmt.Println()
+
+	localName := buildLocalDirName(repoUrl)
 
     // Clone repo
-    cloneCmd := exec.Command("git", "-C", path, "clone", url, localName)
+    cloneCmd := exec.Command("git", "-C", path, "clone", repoUrl, localName)
     cloneCmd.Stdout = os.Stdout
     cloneCmd.Stderr = os.Stderr
     err := cloneCmd.Run()
@@ -78,6 +104,8 @@ func Main(url string, path string) {
     if err != nil {
         fmt.Fprintln(os.Stderr, err.Error())
         return
+    } else {
+        fmt.Println("\nRegistered new repo with zoxide")
     }
 
 }
