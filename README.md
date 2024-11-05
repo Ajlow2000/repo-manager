@@ -1,5 +1,4 @@
-# add-repo
+# repo-manager
 
-A utility for cloning repos into a controlled,
-expected directory as well as registering the
-directory.
+A utility for performing a series of operations related to
+working with git repositories. 
