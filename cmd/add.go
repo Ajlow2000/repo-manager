@@ -13,12 +13,14 @@ var (
     debug = false
     repo = "";
     urlPrefix = "";
-    path = "";
+    destination = "";
 )
 
 // addCmd represents the add command
 var addCmd = &cobra.Command{
-	Use:   "add",
+	Use:   "add URL_PATH",
+    DisableFlagsInUseLine: true,
+    Args: cobra.ExactArgs(1),
 	Short: "Clone a git repo into a managed directory",
 	Long: "Clones a git repo into a specified directory as " +
     "well as perform some basic setup like registering the " +
@@ -27,17 +29,18 @@ var addCmd = &cobra.Command{
     "convenient. Ex: only specifying 'repo-manager' and auto " +
     "prefixing 'git@github:Ajlow2000'",
 	Run: func(cmd *cobra.Command, args []string) {
-        if repo == "" {
+        if len(args) != 1 {
             cmd.Help()
         } else {
+            repo = args[0]
             if (urlPrefix == "") {
                 urlPrefix = viper.GetString("urlPrefix")
             }
 
-            if (path == "") {
-                path = viper.GetString(("managedDir"))
+            if (destination == "") {
+                destination = viper.GetString(("managedDir"))
             }
-		    app.Add(urlPrefix, repo, path)
+		    app.Add(urlPrefix, repo, destination)
         }
 	},
 }
@@ -45,8 +48,7 @@ var addCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(addCmd)
 
-    addCmd.Flags().StringVar(&repo, "repo", "", "The url pointing at a git repository or just the project name (fails if no urlPrefix is provided)")
     addCmd.Flags().StringVar(&urlPrefix, "urlPrefix", "", "The url prefix for the repo name (Ex: git@github:myusername/)")
-    addCmd.Flags().StringVar(&path, "path", "", "The path to clone the specified repo into")
+    addCmd.Flags().StringVar(&destination, "destination", "", "Filepath to clone the specified repo into")
 
 }
