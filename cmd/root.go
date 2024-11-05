@@ -1,30 +1,21 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
-	"github.com/Ajlow2000/add-repo/app"
 	"github.com/spf13/cobra"
-)
-
-var (
-    debug = false
-    url = "";
-    path = "";
+	"github.com/spf13/viper"
 )
 
 
 var rootCmd = &cobra.Command{
-	Use:   "add-repo",
+	Use:   "repo-manager",
 	Short: "",
     Long: "",
     Version: "", 
     Run: func(cmd *cobra.Command, args []string) {
-        if url == "" {
-            cmd.Help()
-        } else {
-		    app.Main(url, path)
-        }
+        cmd.Help()
     },
 }
 
@@ -36,6 +27,19 @@ func Execute() {
 }
 
 func init() {
-    rootCmd.Flags().StringVar(&url, "url", "", "The url pointing at a git repository")
-    rootCmd.Flags().StringVar(&path, "path", "$HOME/repos", "The path to clone the specified url into")
+    viper.SetDefault("managedDir", "$HOME")
+    viper.SetDefault("urlPrefix", "")
+
+    viper.SetConfigName("config")
+    viper.SetConfigType("toml")
+    viper.AddConfigPath("$XDG_CONFIG_HOME/repo-manager") 
+
+    if err := viper.ReadInConfig(); err != nil {
+        if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+            // Config file not found; ignore error if desired
+        } else {
+            // Config file was found but another error was produced
+            panic(fmt.Errorf("fatal error config file: %w", err))
+        }
+    }
 }
