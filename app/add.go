@@ -33,7 +33,7 @@ func buildLocalDirName(url string) string {
     return userName + "_" + projectName;
 }
 
-func buildUrl(urlPrefix string, repo string) string {
+func buildFQDN(urlPrefix string, repo string) string {
     repoUrl := ""
 
     if ( (strings.HasPrefix(repo, GIT_SSH_PREFIX) || strings.HasPrefix(repo, GIT_HTTPS_PREFIX)) && strings.HasSuffix(repo, ".git")) {
@@ -46,6 +46,9 @@ func buildUrl(urlPrefix string, repo string) string {
             } else {
                 repoUrl = urlPrefix + "/" + repo + ".git"
             }
+        } else {
+    	    fmt.Fprintln(os.Stderr, "Specified value for repo is not a valid address to a git repository")
+            os.Exit(1)
         }
     }
 
@@ -55,14 +58,14 @@ func buildUrl(urlPrefix string, repo string) string {
 func Add(urlPrefix string, repo string, path string) {
     path = os.Expand(path, os.Getenv)
 
-    repoUrl := buildUrl(urlPrefix, repo)
-    fmt.Println("Repo url: " + repoUrl)
+    repoFQDN := buildFQDN(urlPrefix, repo)
+    fmt.Println("FQDN: " + repoFQDN)
     fmt.Println()
 
-	localName := buildLocalDirName(repoUrl)
+	localName := buildLocalDirName(repoFQDN)
 
     // Clone repo
-    cloneCmd := exec.Command("git", "-C", path, "clone", repoUrl, localName)
+    cloneCmd := exec.Command("git", "-C", path, "clone", repoFQDN, localName)
     cloneCmd.Stdout = os.Stdout
     cloneCmd.Stderr = os.Stderr
     err := cloneCmd.Run()
@@ -105,7 +108,7 @@ func Add(urlPrefix string, repo string, path string) {
         fmt.Fprintln(os.Stderr, err.Error())
         return
     } else {
-        fmt.Println("\nRegistered new repo with zoxide")
+        fmt.Println("\nRegistered new repository with zoxide")
     }
 
 }

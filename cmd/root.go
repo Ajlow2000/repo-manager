@@ -1,9 +1,11 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 
@@ -25,4 +27,19 @@ func Execute() {
 }
 
 func init() {
+    viper.SetDefault("managedDir", "$HOME")
+    viper.SetDefault("urlPrefix", "")
+
+    viper.SetConfigName("config")
+    viper.SetConfigType("toml")
+    viper.AddConfigPath("$XDG_CONFIG_HOME/repo-manager") 
+
+    if err := viper.ReadInConfig(); err != nil {
+        if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+            // Config file not found; ignore error if desired
+        } else {
+            // Config file was found but another error was produced
+            panic(fmt.Errorf("fatal error config file: %w", err))
+        }
+    }
 }

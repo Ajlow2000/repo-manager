@@ -6,6 +6,7 @@ package cmd
 import (
 	"github.com/Ajlow2000/repo-manager/app"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -29,6 +30,13 @@ var addCmd = &cobra.Command{
         if repo == "" {
             cmd.Help()
         } else {
+            if (urlPrefix == "") {
+                urlPrefix = viper.GetString("urlPrefix")
+            }
+
+            if (path == "") {
+                path = viper.GetString(("managedDir"))
+            }
 		    app.Add(urlPrefix, repo, path)
         }
 	},
@@ -39,5 +47,6 @@ func init() {
 
     addCmd.Flags().StringVar(&repo, "repo", "", "The url pointing at a git repository or just the project name (fails if no urlPrefix is provided)")
     addCmd.Flags().StringVar(&urlPrefix, "urlPrefix", "", "The url prefix for the repo name (Ex: git@github:myusername/)")
-    addCmd.Flags().StringVar(&path, "path", "$HOME", "The path to clone the specified repo into")
+    addCmd.Flags().StringVar(&path, "path", "", "The path to clone the specified repo into")
+
 }
